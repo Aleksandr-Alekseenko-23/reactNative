@@ -14,11 +14,12 @@ import {
 import React, { useState, useEffect } from "react";
 
 const initialState = {
+  userName: "",
   email: "",
   password: "",
 };
 
-const RegistrationScreen = () => {
+const RegistrationScreen = ({ navigation }) => {
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [state, setState] = useState(initialState);
   const [dimensions, setDimensions] = useState(
@@ -50,18 +51,28 @@ const RegistrationScreen = () => {
         >
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.keyboard}
+            // style={styles.keyboard}
           >
             <View
               style={{
                 ...styles.wrapper,
                 paddingBottom: isShowKeyboard ? 32 : 78,
-                width: dimensions,
+                // width: dimensions,
+                paddingHorizontal: 16,
               }}
             >
               <View style={styles.wrapperText}>
-                <Text style={styles.text}>Войти</Text>
+                <Text style={styles.text}>Регистрация</Text>
               </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Логин"
+                onFocus={() => setIsShowKeyboard(true)}
+                onTextInput={(value) =>
+                  setState((prevState) => ({ ...prevState, userName: value }))
+                }
+                value={state.userName}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="Адрес электронной почты"
@@ -87,10 +98,16 @@ const RegistrationScreen = () => {
                 activeOpacity={0.7}
                 onPress={keyboardHide}
               >
-                <Text style={styles.textBtn}>Войти</Text>
+                <Text style={styles.textBtn}>Зарегистрироваться</Text>
               </TouchableOpacity>
               <Text style={styles.textLogin}>
-                Нет аккаунта? Зарегистрироваться
+                Уже есть аккаунт?{" "}
+                <Text
+                  style={styles.textLogin}
+                  onPress={() => navigation.navigate("Login")}
+                >
+                  Войти
+                </Text>
               </Text>
             </View>
           </KeyboardAvoidingView>
@@ -119,7 +136,7 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: "cover",
     justifyContent: "flex-end",
-    alignItems: "center",
+    // alignItems: "center",
   },
   text: {
     color: "#212121",
@@ -155,10 +172,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
   },
-  keyboard: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
+  // keyboard: {
+  //   flex: 1,
+  //   justifyContent: "flex-end",
+  // },
   textLogin: {
     color: "#1B4371",
     fontFamily: "Roboto-Regular",
