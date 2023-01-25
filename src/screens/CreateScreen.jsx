@@ -3,7 +3,7 @@ import React from "react";
 
 const CreateScreen = () => {
   return (
-    <View>
+    <View style={styles.container}>
       <Text>CreateScreen</Text>
     </View>
   );
@@ -11,4 +11,10 @@ const CreateScreen = () => {
 
 export default CreateScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

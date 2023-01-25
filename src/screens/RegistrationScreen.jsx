@@ -142,7 +142,6 @@ const styles = StyleSheet.create({
     color: "#212121",
     fontFamily: "Roboto-Medium",
     fontSize: 30,
-    fontWeight: 500,
     lineHeight: 35,
     letterSpacing: 0.01,
     marginBottom: 33,
@@ -168,7 +167,6 @@ const styles = StyleSheet.create({
   textBtn: {
     color: "#fff",
     fontFamily: "Roboto-Regular",
-    fontWeight: 400,
     fontSize: 16,
     lineHeight: 19,
   },
@@ -179,7 +177,6 @@ const styles = StyleSheet.create({
   textLogin: {
     color: "#1B4371",
     fontFamily: "Roboto-Regular",
-    fontWeight: 400,
     fontSize: 16,
     lineHeight: 19,
     marginTop: 16,
