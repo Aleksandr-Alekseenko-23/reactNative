@@ -6,9 +6,10 @@ SplashScreen.preventAutoHideAsync();
 import { useFonts } from "expo-font";
 import { useCallback } from "react";
 import useRoute from "./src/hooks/useRoute";
+import { View } from "react-native";
 
 export default function App() {
-  const routing = useRoute(null);
+  const routing = useRoute({});
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("./src/assets/font/Roboto-Regular.ttf"),
     "Roboto-Medium": require("./src/assets/font/Roboto-Medium.ttf"),
@@ -24,5 +25,11 @@ export default function App() {
     return null;
   }
 
-  return <NavigationContainer>{routing}</NavigationContainer>;
+  return (
+    <NavigationContainer>
+      <View onLayout={onLayoutRootView} style={{ flex: 1 }}>
+        {routing}
+      </View>
+    </NavigationContainer>
+  );
 }
