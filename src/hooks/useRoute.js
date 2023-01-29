@@ -2,9 +2,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 const Stack = createStackNavigator();
 
-import RegistrationScreen from "../screens/RegistrationScreen";
-import LoginScreen from "../screens/LoginScreen";
-import Home from "../screens/Home";
+import RegistrationScreen from "../screens/auth/RegistrationScreen";
+import LoginScreen from "../screens/auth/LoginScreen";
+import Home from "../screens/home/Home";
 
 const useRoute = (isAuth) => {
   return (

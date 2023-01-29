@@ -6,7 +6,7 @@ const MainTab = createBottomTabNavigator();
 
 import PostsScreen from "./PostsScreen";
 import ProfileScreen from "./ProfileScreen";
-import CreateScreen from "./CreateScreen";
+import CreatePostsScreen from "./CreatePostsScreen";
 
 import { AntDesign, Feather } from "@expo/vector-icons";
 
@@ -62,7 +62,7 @@ const Home = ({ navigation }) => {
 
       <MainTab.Screen
         name="Create"
-        component={CreateScreen}
+        component={CreatePostsScreen}
         options={{
           tabBarStyle: { display: "none" },
           tabBarIcon: ({ focused, size, color }) => (

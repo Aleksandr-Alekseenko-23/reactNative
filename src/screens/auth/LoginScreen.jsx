@@ -14,12 +14,11 @@ import {
 import React, { useState, useEffect } from "react";
 
 const initialState = {
-  userName: "",
   email: "",
   password: "",
 };
 
-const RegistrationScreen = ({ navigation }) => {
+const LoginScreen = ({ navigation }) => {
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [state, setState] = useState(initialState);
   const [dimensions, setDimensions] = useState(
@@ -46,12 +45,12 @@ const RegistrationScreen = ({ navigation }) => {
     <TouchableWithoutFeedback onPress={keyboardHide}>
       <View style={styles.container}>
         <ImageBackground
-          source={require("../assets/img/PhotoBG.jpg")}
+          source={require("../../assets/img/PhotoBG.jpg")}
           style={styles.image}
         >
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            // style={styles.keyboard}
+            style={styles.keyboard}
           >
             <View
               style={{
@@ -62,17 +61,8 @@ const RegistrationScreen = ({ navigation }) => {
               }}
             >
               <View style={styles.wrapperText}>
-                <Text style={styles.text}>Регистрация</Text>
+                <Text style={styles.text}>Войти</Text>
               </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Логин"
-                onFocus={() => setIsShowKeyboard(true)}
-                onTextInput={(value) =>
-                  setState((prevState) => ({ ...prevState, userName: value }))
-                }
-                value={state.userName}
-              />
               <TextInput
                 style={styles.input}
                 placeholder="Адрес электронной почты"
@@ -98,15 +88,15 @@ const RegistrationScreen = ({ navigation }) => {
                 activeOpacity={0.7}
                 onPress={keyboardHide}
               >
-                <Text style={styles.textBtn}>Зарегистрироваться</Text>
+                <Text style={styles.textBtn}>Войти</Text>
               </TouchableOpacity>
               <Text style={styles.textLogin}>
-                Уже есть аккаунт?{" "}
+                Нет аккаунта?{" "}
                 <Text
                   style={styles.textLogin}
-                  onPress={() => navigation.navigate("Login")}
+                  onPress={() => navigation.navigate("Register")}
                 >
-                  Войти
+                  Зарегистрироваться
                 </Text>
               </Text>
             </View>
@@ -117,12 +107,16 @@ const RegistrationScreen = ({ navigation }) => {
   );
 };
 
-export default RegistrationScreen;
+export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  image: {
+    flex: 1,
+    justifyContent: "flex-end",
   },
   wrapper: {
     backgroundColor: "#fff",
@@ -131,12 +125,6 @@ const styles = StyleSheet.create({
   },
   wrapperText: {
     alignItems: "center",
-  },
-  image: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "flex-end",
-    // alignItems: "center",
   },
   text: {
     color: "#212121",
@@ -170,10 +158,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
   },
-  // keyboard: {
-  //   flex: 1,
-  //   justifyContent: "flex-end",
-  // },
   textLogin: {
     color: "#1B4371",
     fontFamily: "Roboto-Regular",
