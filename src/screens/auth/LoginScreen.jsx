@@ -12,6 +12,8 @@ import {
   Dimensions,
 } from "react-native";
 import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { authLoginUser } from "../../redux/auth/authOperations";
 
 const initialState = {
   email: "",
@@ -25,6 +27,8 @@ const LoginScreen = ({ navigation }) => {
     Dimensions.get("window").width - 16 * 2
   );
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const onChange = () => {
       const width = Dimensions.get("window").width - 16 * 2;
@@ -35,17 +39,18 @@ const LoginScreen = ({ navigation }) => {
     return () => subscription?.remove();
   }, []);
 
-  const keyboardHide = () => {
+  const handleSubmit = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
     console.log(state);
+    dispatch(authLoginUser(state));
     setState(initialState);
   };
   return (
-    <TouchableWithoutFeedback onPress={keyboardHide}>
+    <TouchableWithoutFeedback onPress={handleSubmit}>
       <View style={styles.container}>
         <ImageBackground
-          source={require("../../assets/img/PhotoBG.jpg")}
+          source={require("../../assets/img/PhotoBG.png")}
           style={styles.image}
         >
           <KeyboardAvoidingView
@@ -67,7 +72,7 @@ const LoginScreen = ({ navigation }) => {
                 style={styles.input}
                 placeholder="Адрес электронной почты"
                 onFocus={() => setIsShowKeyboard(true)}
-                onTextInput={(value) =>
+                onChangeText={(value) =>
                   setState((prevState) => ({ ...prevState, email: value }))
                 }
                 value={state.email}
@@ -77,7 +82,7 @@ const LoginScreen = ({ navigation }) => {
                 placeholder="Пароль"
                 secureTextEntry={true}
                 onFocus={() => setIsShowKeyboard(true)}
-                onTextInput={(value) =>
+                onChangeText={(value) =>
                   setState((prevState) => ({ ...prevState, password: value }))
                 }
                 value={state.password}
@@ -86,7 +91,7 @@ const LoginScreen = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.btn}
                 activeOpacity={0.7}
-                onPress={keyboardHide}
+                onPress={handleSubmit}
               >
                 <Text style={styles.textBtn}>Войти</Text>
               </TouchableOpacity>
@@ -165,5 +170,9 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     marginTop: 16,
     textAlign: "center",
+  },
+  keyboard: {
+    flex: 1,
+    justifyContent: "flex-end",
   },
 });

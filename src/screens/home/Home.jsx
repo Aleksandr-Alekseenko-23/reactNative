@@ -1,6 +1,8 @@
 import { View } from "react-native";
 import React from "react";
+import { useDispatch } from "react-redux";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 const MainTab = createBottomTabNavigator();
 
@@ -9,8 +11,15 @@ import ProfileScreen from "./ProfileScreen";
 import CreatePostsScreen from "./CreatePostsScreen";
 
 import { AntDesign, Feather } from "@expo/vector-icons";
+import { authLogoutUser } from "../../redux/auth/authOperations";
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, route }) => {
+  const dispatch = useDispatch();
+
+  const logout = () => {
+    dispatch(authLogoutUser());
+  };
+
   return (
     <MainTab.Navigator
       initialRouteName="Posts"
@@ -35,28 +44,34 @@ const Home = ({ navigation }) => {
       <MainTab.Screen
         name="Posts"
         component={PostsScreen}
-        options={{
-          tabBarIcon: ({ focused, size, color }) => (
-            <AntDesign name="appstore-o" size={size} color={color} />
-          ),
-          title: "Публикации",
-          headerTitleStyle: {
-            fontFamily: "Roboto-Medium",
-            color: "#212121",
-            fontSize: 17,
-            lineHeight: 22,
-          },
-          headerRight: () => (
-            <Feather
-              name="log-out"
-              color="#BDBDBD"
-              size={24}
-              style={{ marginRight: 10 }}
-              onPress={() => {
-                console.log("logout");
-              }}
-            />
-          ),
+        options={({ route }) => {
+          const activeRoute = getFocusedRouteNameFromRoute(route);
+          return {
+            tabBarIcon: ({ focused, size, color }) => (
+              <AntDesign name="appstore-o" size={size} color={color} />
+            ),
+            title: "Публикации",
+            headerTitleStyle: {
+              fontFamily: "Roboto-Medium",
+              color: "#212121",
+              fontSize: 17,
+              lineHeight: 22,
+            },
+            headerRight: () => (
+              <Feather
+                name="log-out"
+                color="#BDBDBD"
+                size={24}
+                style={{ marginRight: 10 }}
+                onPress={logout}
+              />
+            ),
+
+            headerShown:
+              activeRoute === "Map" || activeRoute === "Comments"
+                ? false
+                : true,
+          };
         }}
       />
 

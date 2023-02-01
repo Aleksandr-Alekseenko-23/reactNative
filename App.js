@@ -1,15 +1,16 @@
-import { NavigationContainer } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 
 SplashScreen.preventAutoHideAsync();
 
 import { useFonts } from "expo-font";
 import { useCallback } from "react";
-import useRoute from "./src/hooks/useRoute";
+
 import { View } from "react-native";
+import { Provider } from "react-redux";
+import { store } from "./src/redux/store";
+import Main from "./src/components/Main";
 
 export default function App() {
-  const routing = useRoute({});
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("./src/assets/font/Roboto-Regular.ttf"),
     "Roboto-Medium": require("./src/assets/font/Roboto-Medium.ttf"),
@@ -26,10 +27,10 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
+    <Provider store={store}>
       <View onLayout={onLayoutRootView} style={{ flex: 1 }}>
-        {routing}
+        <Main />
       </View>
-    </NavigationContainer>
+    </Provider>
   );
 }
