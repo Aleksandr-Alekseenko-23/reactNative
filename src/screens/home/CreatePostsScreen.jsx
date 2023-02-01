@@ -16,12 +16,10 @@ import * as MediaLibrary from "expo-media-library";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import * as Location from "expo-location";
-
-// const initialState = {
-//   photo: "",
-//   photoTitle: "",
-//   photoLocation: "",
-// };
+import { storage, db } from "../../firebase/config";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { collection, addDoc } from "firebase/firestore";
+import { useSelector } from "react-redux";
 
 const CreatePostsScreen = ({ navigation }) => {
   const [photo, setPhoto] = useState("");
@@ -35,6 +33,7 @@ const CreatePostsScreen = ({ navigation }) => {
   const [locationCoords, setLocationCoords] = useState(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+  const { userId, userName } = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     (async () => {
@@ -54,6 +53,7 @@ const CreatePostsScreen = ({ navigation }) => {
       const options = { quality: 0.5, base64: true, skipProcessing: true };
       const { uri } = await cameraRef.current.takePictureAsync(options);
       setPhoto(uri);
+
       setIsCameraActive(false);
       getLocation();
     }
@@ -73,10 +73,6 @@ const CreatePostsScreen = ({ navigation }) => {
         ? Camera.Constants.FlashMode.on
         : Camera.Constants.FlashMode.off
     );
-  };
-
-  const sendPhoto = () => {
-    navigation.navigate("DefaultPosts", { photo, photoTitle, photoLocation });
   };
 
   useEffect(() => {
@@ -107,65 +103,124 @@ const CreatePostsScreen = ({ navigation }) => {
     Keyboard.dismiss();
   };
 
+  const uploadPhotoToServer = async () => {
+    const response = await fetch(photo);
+    const file = await response.blob();
+
+    const uniquePostId = Date.now().toString();
+
+    const pathPhoto = `postImage/${uniquePostId}.jpg`;
+
+    const photoRef = ref(storage, pathPhoto);
+
+    const uploadPhoto = await uploadBytes(photoRef, file, {
+      contentType: "image/jpeg",
+    });
+
+    const processedPhoto = await getDownloadURL(uploadPhoto.ref);
+
+    return processedPhoto;
+  };
+
+  const uploadPostToServer = async () => {
+    const photoToServer = await uploadPhotoToServer();
+    const datePost = Date.now();
+    const docRef = await addDoc(collection(db, "posts"), {
+      photoToServer,
+      datePost,
+      photoLocation,
+      locationCoords,
+      photoTitle,
+      userId,
+      userName,
+    });
+  };
+
+  const sendPost = () => {
+    uploadPostToServer();
+    navigation.navigate("DefaultPosts");
+    setPhoto("");
+    setPhotoTitle("");
+    setPhotoLocation("");
+    setIsCameraActive(true);
+  };
+
+  const deletePost = () => {
+    setPhoto("");
+    setPhotoTitle("");
+    setPhotoLocation("");
+    setIsCameraActive(true);
+  };
+
   return (
-    <TouchableWithoutFeedback onPress={keyboardHide}>
-      <View style={styles.container}>
-        <View>
-          {isCameraActive ? (
-            <Camera
-              switchCamera={switchCamera}
-              switchFlashMode={switchFlashMode}
-              style={styles.camera}
-              type={cameraType}
-              flashMode={flesh}
-              ref={cameraRef}
-              onCameraReady={onCameraReady}
-            />
+    <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={keyboardHide}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : ""}
+          // style={styles.keyboard}
+        >
+          <View>
+            {isCameraActive ? (
+              <Camera
+                switchCamera={switchCamera}
+                switchFlashMode={switchFlashMode}
+                style={{
+                  ...styles.camera,
+                  marginTop: isShowKeyboard ? 7 : 32,
+                }}
+                type={cameraType}
+                flashMode={flesh}
+                ref={cameraRef}
+                onCameraReady={onCameraReady}
+              />
+            ) : (
+              <View style={styles.takePhotoContainer}>
+                <Image source={{ uri: photo }} style={{ height: 240 }} />
+              </View>
+            )}
+            <TouchableOpacity
+              onPress={takePicture}
+              style={{
+                height: 60,
+                width: 60,
+                backgroundColor: "rgba(255, 255, 255, 0.3)",
+                borderRadius: "50%",
+                top: "50%",
+                left: (Dimensions.get("window").width - 32 - 30) / 2,
+                zIndex: 10,
+                position: "absolute",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <MaterialIcons name="photo-camera" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+          {!photo ? (
+            <Text style={styles.uploadEditText}>Загрузите фото</Text>
           ) : (
-            <View style={styles.takePhotoContainer}>
-              <Image source={{ uri: photo }} style={{ height: 240 }} />
-            </View>
+            <TouchableOpacity
+              onPress={() => {
+                setPhoto("");
+                setIsCameraActive(true);
+              }}
+            >
+              <Text style={styles.uploadEditText}>Редактировать фото</Text>
+            </TouchableOpacity>
           )}
-          <TouchableOpacity
-            onPress={takePicture}
-            style={{
-              height: 60,
-              width: 60,
-              backgroundColor: "rgba(255, 255, 255, 0.3)",
-              borderRadius: "50%",
-              top: "50%",
-              left: (Dimensions.get("window").width - 32 - 30) / 2,
-              zIndex: 10,
-              position: "absolute",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <MaterialIcons name="photo-camera" size={20} color="#fff" />
-          </TouchableOpacity>
-        </View>
-        {!photo ? (
-          <Text style={styles.uploadEditText}>Загрузите фото</Text>
-        ) : (
-          <TouchableOpacity
-            onPress={() => {
-              setPhoto("");
-              setIsCameraActive(true);
-            }}
-          >
-            <Text style={styles.uploadEditText}>Редактировать фото</Text>
-          </TouchableOpacity>
-        )}
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : ""}>
+
           <View style={styles.wrapper}>
             <TextInput
-              style={styles.inputName}
+              style={{
+                ...styles.inputName,
+                marginTop: isShowKeyboard ? 20 : 48,
+              }}
               placeholder="Название..."
               placeholderTextColor={{
                 color: "#BDBDBD",
               }}
               onFocus={() => setIsShowKeyboard(true)}
-              onTextInput={(value) =>
+              onChangeText={(value) =>
                 setPhotoTitle((prevState) => ({
                   ...prevState,
                   photoTitle: value,
@@ -185,7 +240,7 @@ const CreatePostsScreen = ({ navigation }) => {
                 color: "#BDBDBD",
               }}
               onFocus={() => setIsShowKeyboard(true)}
-              onTextInput={(value) =>
+              onChangeText={(value) =>
                 setPhotoLocation((prevState) => ({
                   ...prevState,
                   photoLocation: value,
@@ -202,7 +257,7 @@ const CreatePostsScreen = ({ navigation }) => {
             }}
             activeOpacity={0.7}
             onPress={() => {
-              sendPhoto(), setPhoto(""), setIsCameraActive(true);
+              sendPost();
             }}
           >
             <Text
@@ -217,23 +272,24 @@ const CreatePostsScreen = ({ navigation }) => {
               Опубликовать
             </Text>
           </TouchableOpacity>
+          <View style={{ alignItems: "center", paddingTop: 120 }}>
+            <TouchableOpacity
+              style={{
+                width: 70,
+                height: 40,
+                backgroundColor: "#F6F6F6",
+                borderRadius: 20,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={deletePost}
+            >
+              <AntDesign name="delete" size={24} color="#BDBDBD" />
+            </TouchableOpacity>
+          </View>
         </KeyboardAvoidingView>
-        <View style={{ alignItems: "center", paddingTop: 120 }}>
-          <TouchableOpacity
-            style={{
-              width: 70,
-              height: 40,
-              backgroundColor: "#F6F6F6",
-              borderRadius: 20,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <AntDesign name="delete" size={24} color="#BDBDBD" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </View>
   );
 };
 
@@ -247,7 +303,6 @@ const styles = StyleSheet.create({
   camera: {
     height: 240,
     marginHorizontal: 16,
-    marginTop: 32,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -265,7 +320,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   inputName: {
-    marginTop: 48,
     marginBottom: 15,
     fontFamily: "Roboto-Medium",
     fontSize: 16,
@@ -299,5 +353,9 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
     fontSize: 16,
     lineHeight: 19,
+  },
+  keyboard: {
+    flex: 1,
+    justifyContent: "flex-end",
   },
 });
