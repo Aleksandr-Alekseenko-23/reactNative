@@ -94,7 +94,6 @@ const CreatePostsScreen = ({ navigation }) => {
   const getLocation = async () => {
     const placePhoto = await Location.reverseGeocodeAsync(locationCoords);
     const place = `${placePhoto[0].region}, ${placePhoto[0].country}`;
-    console.log("location", place);
     setPhotoLocation((prev) => ({ ...prev, place }));
   };
 

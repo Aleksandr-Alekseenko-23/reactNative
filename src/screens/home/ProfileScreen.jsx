@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingBottom: 32,
+    flex: 1,
   },
   avatarWrapper: {
     height: 120,
