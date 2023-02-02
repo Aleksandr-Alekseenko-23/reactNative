@@ -31,7 +31,6 @@ const DefaultPostsScreen = ({ navigation }) => {
   useEffect(() => {
     getAllPosts();
   }, []);
-  console.log(posts);
 
   return (
     <View style={styles.container}>

@@ -37,7 +37,6 @@ const RegistrationScreen = ({ navigation }) => {
   useEffect(() => {
     const onChange = () => {
       const width = Dimensions.get("window").width - 16 * 2;
-      console.log(width);
       setDimensions(width);
     };
     const subscription = Dimensions.addEventListener("change", onChange);
@@ -70,6 +69,7 @@ const RegistrationScreen = ({ navigation }) => {
   const handleSubmit = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
+    console.log("state", state);
     dispatch(authRegisterUser(state));
     setState(initialState);
   };

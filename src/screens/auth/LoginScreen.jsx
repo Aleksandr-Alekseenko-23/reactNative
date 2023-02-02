@@ -32,7 +32,6 @@ const LoginScreen = ({ navigation }) => {
   useEffect(() => {
     const onChange = () => {
       const width = Dimensions.get("window").width - 16 * 2;
-      console.log(width);
       setDimensions(width);
     };
     const subscription = Dimensions.addEventListener("change", onChange);
@@ -42,7 +41,6 @@ const LoginScreen = ({ navigation }) => {
   const handleSubmit = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
-    console.log(state);
     dispatch(authLoginUser(state));
     setState(initialState);
   };

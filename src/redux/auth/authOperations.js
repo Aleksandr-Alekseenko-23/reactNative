@@ -13,6 +13,7 @@ import {
 import { auth } from "../../firebase/config";
 import { updateProfile } from "firebase/auth";
 import { uploadPhotoToServer } from "../../firebase/uploadPhoto";
+import { Alert } from "react-native";
 
 const authRegisterUser =
   ({ userName, email, password, avatar }) =>
@@ -25,7 +26,7 @@ const authRegisterUser =
       );
 
       const userAvatarUrl = await uploadPhotoToServer(avatar);
-
+      console.log("userName", userName);
       await updateProfile(auth.currentUser, {
         displayName: userName,
         photoURL: userAvatarUrl,
@@ -40,6 +41,7 @@ const authRegisterUser =
         })
       );
     } catch (error) {
+      Alert.alert("Oops, something went wrong");
       console.log(error);
       console.log(error.massege);
     }
@@ -50,7 +52,7 @@ const authLoginUser =
   async (dispatch, getState) => {
     try {
       const { user } = await signInWithEmailAndPassword(auth, email, password);
-      console.log("user", user);
+
       const userUpdateProfile = {
         userId: user.uid,
         userName: user.displayName,
@@ -60,6 +62,7 @@ const authLoginUser =
 
       dispatch(updateUserProfile(userUpdateProfile));
     } catch (error) {
+      Alert.alert(`"Email or password invalid"`);
       console.log(error);
       console.log(error.massege);
     }
@@ -70,6 +73,7 @@ const authLogoutUser = () => async (dispatch, getState) => {
     signOut(auth);
     dispatch(authSignOut());
   } catch (error) {
+    Alert.alert("Oops, something went wrong");
     console.log(error);
     console.log(error.massege);
   }
@@ -94,7 +98,6 @@ const authStateChangeUser = () => async (dispatch, getState) => {
 const updateUserAvatar =
   ({ avatar }) =>
   async (dispatch, getState) => {
-    console.log("avatar", avatar);
     try {
       await updateProfile(auth.currentUser, {
         photoURL: avatar,
@@ -102,6 +105,7 @@ const updateUserAvatar =
 
       dispatch(updateAvatarUser(avatar));
     } catch (error) {
+      Alert.alert("Oops, something went wrong");
       console.log(error);
       console.log(error.massege);
     }
